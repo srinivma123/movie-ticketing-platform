@@ -1,0 +1,249 @@
+openapi: 3.0.3
+info:
+  title: Show Management API
+  description: API for managing shows in theaters.
+  version: 1.0.0
+servers:
+  - url: /api/shows
+    description: Base URL for the Show Management API
+paths:
+  /browse:
+    get:
+      summary: Browse shows by movie title, city, and date
+      description: Retrieve a list of shows for a specific movie in a given city and date.
+      parameters:
+        - name: movieTitle
+          in: query
+          required: true
+          description: Title of the movie.
+          schema:
+            type: string
+        - name: city
+          in: query
+          required: true
+          description: City where the show is being played.
+          schema:
+            type: string
+        - name: date
+          in: query
+          required: true
+          description: Date of the show (format: yyyy-MM-dd).
+          schema:
+            type: string
+            format: date
+        - name: includeLocalizationContent
+          in: query
+          required: false
+          description: Whether to include localization content in the response.
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: List of shows retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShowsDTO'
+        '400':
+          description: Invalid input parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /:
+    post:
+      summary: Create a new show
+      description: Add a new show to the database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateShowRequest'
+      responses:
+        '201':
+          description: Show created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShowsDTO'
+        '400':
+          description: Invalid input data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /{showId}:
+    put:
+      summary: Update an existing show
+      description: Update the details of an existing show.
+      parameters:
+        - name: showId
+          in: path
+          required: true
+          description: ID of the show to update.
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateShowRequest'
+      responses:
+        '200':
+          description: Show updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShowsDTO'
+        '400':
+          description: Invalid input data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Show not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete a show
+      description: Delete an existing show by its ID.
+      parameters:
+        - name: showId
+          in: path
+          required: true
+          description: ID of the show to delete.
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteShowRequest'
+      responses:
+        '204':
+          description: Show deleted successfully.
+        '400':
+          description: Invalid input data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Show not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ShowsDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the show.
+        showTime:
+          type: string
+          format: date-time
+          description: Date and time of the show.
+        availableSeats:
+          type: integer
+          description: Number of available seats for the show.
+        totalSeats:
+          type: integer
+          description: Total number of seats for the show.
+        movie:
+          type: object
+          description: Details of the movie.
+        theatre:
+          type: object
+          description: Details of the theatre.
+    CreateShowRequest:
+      type: object
+      properties:
+        theatreId:
+          type: integer
+          description: ID of the theatre.
+        movieId:
+          type: integer
+          description: ID of the movie.
+        showTime:
+          type: string
+          format: date-time
+          description: Date and time of the show.
+        availableSeats:
+          type: integer
+          description: Number of available seats for the show.
+        totalSeats:
+          type: integer
+          description: Total number of seats for the show.
+    UpdateShowRequest:
+      type: object
+      properties:
+        showId:
+          type: integer
+          description: ID of the show to update.
+        theatreId:
+          type: integer
+          description: ID of the theatre.
+        showTime:
+          type: string
+          format: date-time
+          description: Date and time of the show.
+        availableSeats:
+          type: integer
+          description: Number of available seats for the show.
+        totalSeats:
+          type: integer
+          description: Total number of seats for the show.
+    DeleteShowRequest:
+      type: object
+      properties:
+        showId:
+          type: integer
+          description: ID of the show to delete.
+        theatreId:
+          type: integer
+          description: ID of the theatre.
+    ErrorResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          description: HTTP status code.
+        message:
+          type: string
+          description: Error message.

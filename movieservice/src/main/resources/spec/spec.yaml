@@ -1,0 +1,171 @@
+openapi: 3.0.3
+info:
+  title: Movie Service API
+  description: API for managing movies and their localizations.
+  version: 1.0.0
+servers:
+  - url: /api/movies
+    description: Base URL for the Movie Service API
+paths:
+  /{id}:
+    get:
+      summary: Get movie by ID
+      description: Retrieve a movie by its unique ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the movie to retrieve.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Movie retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '404':
+          description: Movie not found.
+          content:
+            application/json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: string
+  /title/{title}:
+    get:
+      summary: Get movie by title
+      description: Retrieve a movie by its title, with optional localization content.
+      parameters:
+        - name: title
+          in: path
+          required: true
+          description: The title of the movie to retrieve.
+          schema:
+            type: string
+        - name: includeLocalizationContent
+          in: query
+          required: false
+          description: Whether to include localization content in the response.
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Movie retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '404':
+          description: Movie not found.
+          content:
+            application/json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: string
+  /:
+    post:
+      summary: Add a new movie
+      description: Add a new movie to the database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Movie'
+      responses:
+        '200':
+          description: Movie added successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: string
+components:
+  schemas:
+    Movie:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the movie.
+        title:
+          type: string
+          description: Title of the movie.
+        language:
+          type: string
+          description: Language of the movie.
+        genre:
+          type: string
+          description: Genre of the movie.
+        duration:
+          type: integer
+          description: Duration of the movie in minutes.
+        localizations:
+          type: array
+          description: List of localizations for the movie.
+          items:
+            $ref: '#/components/schemas/Localization'
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the movie was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the movie was last updated.
+    Localization:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the localization.
+        language:
+          type: string
+          description: Language of the localization.
+        region:
+          type: string
+          description: Region of the localization.
+        title:
+          type: string
+          description: Localized title of the movie.
+        description:
+          type: string
+          description: Localized description of the movie.
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the localization was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the localization was last updated.
+  responses:
+    NotFound:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            type: string
+    InternalServerError:
+      description: Internal server error.
+      content:
+        application/json:
+          schema:
+            type: string

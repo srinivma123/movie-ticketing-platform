@@ -1,0 +1,16 @@
+package com.example.showmanagement.repository;
+
+import com.example.showmanagement.entity.Movies;
+import com.example.showmanagement.entity.Shows;
+import com.example.showmanagement.entity.Theatres;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+public interface TheaterRepository extends JpaRepository<Theatres, Integer> {
+
+}
