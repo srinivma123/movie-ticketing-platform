@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: postgresuser
+      POSTGRES_PASSWORD: password@123
+      POSTGRES_DB: movies
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  movieservice:
+    build:
+      context: C:/Users/mahes/movieservice/movieservice
+      dockerfile: Dockerfile
+    container_name: movieservice_container
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/movies
+      SPRING_DATASOURCE_USERNAME: postgresuser
+      SPRING_DATASOURCE_PASSWORD: password@123
+    ports:
+      - "8565:8080"
+    depends_on:
+      - postgres
+      
+  showmanagementservice:
+    build:
+      context: C:/Users/mahes/movieticketbooking/movieticketbooking
+      dockerfile: Dockerfile
+    container_name: showservice_container
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/movies
+      SPRING_DATASOURCE_USERNAME: postgresuser
+      SPRING_DATASOURCE_PASSWORD: password@123
+    ports:
+      - "8566:8080"
+    depends_on:
+      - postgres 
+
+
+  theatermanagementservice:
+    build:
+      context: C:/Users/mahes/theatermanagement/theatermanagement
+      dockerfile: Dockerfile
+    container_name: theaterservice_container
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/movies
+      SPRING_DATASOURCE_USERNAME: postgresuser
+      SPRING_DATASOURCE_PASSWORD: password@123
+    ports:
+      - "8564:8080"
+    depends_on:
+      - postgres            
+
+  
+
+volumes:
+  postgres_data:
